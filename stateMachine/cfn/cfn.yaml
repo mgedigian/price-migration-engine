@@ -43,6 +43,7 @@ Resources:
                 Resource:
                   - Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-EstimatingLambda
                   - Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-CreatingSalesforceRecordsLambda
+                  - Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-NotificationEmailLambda
         - PolicyName: LoggingPolicy
           PolicyDocument:
             Statement:

@@ -210,4 +210,4 @@ Resources:
           NotificationEmailLambdaArn:
             Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-NotificationEmailLambda
       DependsOn:
-        CohortStateMachineExecutionRole
+        - CohortStateMachineExecutionRole

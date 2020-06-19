@@ -412,3 +412,7 @@ Outputs:
     Value: !GetAtt PriceMigrationEngineSalesforcePriceCreationLambda.Arn
     Export:
       Name: !Sub "${AWS::StackName}-CreatingSalesforceRecordsLambda"
+  PriceMigrationEngineNotificationEmailLambdaOutput:
+    Value: !GetAtt PriceMigrationEngineNotificationEmailLambda.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-NotificationEmailLambda"

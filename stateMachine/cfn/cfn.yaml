@@ -56,6 +56,39 @@ Resources:
                 Resource:
                   - !GetAtt CohortStateMachineLogGroup.Arn
 
+  CohortStateMachineScheduleIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - Fn::Sub: "events.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: CohortStateMachineExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "states:StartExecution"
+                Resource:
+                  - !Ref CohortStateMachine
+
+  CohortStateMachineSchedule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: Schedules state machine to run weekdays at 11:30
+      ScheduleExpression: cron(30 11 * * 1-5)
+      State: ENABLED
+      Targets:
+        - Arn: !Sub ${CohortStateMachine.Arn}
+          Id: LambdaSchedule
+          RoleArn: !Sub ${CohortStateMachineScheduleIAMRole.Arn}
+
   CohortStateMachine:
     Type: AWS::StepFunctions::StateMachine
     DependsOn:
@@ -137,6 +170,33 @@ Resources:
                         "End": true
                       }
                     }
+                  },
+                  {
+                    "StartAt": "SendingPriceRiseNotfications",
+                    "States": {
+                      "SendingPriceRiseNotfications": {
+                        "Type": "Task",
+                        "Resource": "${NotificationEmailLambdaArn}",
+                        "Retry": [
+                          {
+                            "ErrorEquals": [
+                              "Lambda.Unknown"
+                            ],
+                            "IntervalSeconds": 10,
+                            "MaxAttempts": 25000,
+                            "BackoffRate": 1.0
+                          },
+                          {
+                            "ErrorEquals": [
+                              "States.ALL"
+                            ],
+                            "IntervalSeconds": 30,
+                            "MaxAttempts": 25000,
+                            "BackoffRate": 2.0
+                          }
+                        ],                        "End": true
+                      }
+                    }
                   }
                 ]
               }
@@ -146,3 +206,5 @@ Resources:
             Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-EstimatingLambda
           CreatingSalesforceRecordsLambdaArn:
             Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-CreatingSalesforceRecordsLambda
+          NotificationEmailLambdaArn:
+            Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-NotificationEmailLambda

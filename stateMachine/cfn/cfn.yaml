@@ -54,6 +54,9 @@ Resources:
                   - logs:CreateLogDelivery
                   - logs:UpdateLogDelivery
                   - logs:DescribeLogGroups
+                  - logs:DeleteLogDelivery
+                  - logs:PutResourcePolicy
+                  - logs:DescribeResourcePolicies
                 Resource:
                   - !GetAtt CohortStateMachineLogGroup.Arn
 
@@ -209,5 +212,3 @@ Resources:
             Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-CreatingSalesforceRecordsLambda
           NotificationEmailLambdaArn:
             Fn::ImportValue: !Sub membership-${Stage}-${ResourceNamePrefix}-lambda-NotificationEmailLambda
-      DependsOn:
-        - CohortStateMachineExecutionRole

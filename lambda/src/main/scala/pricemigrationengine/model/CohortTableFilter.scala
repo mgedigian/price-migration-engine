@@ -42,6 +42,10 @@ object CohortTableFilter {
     override val value: String = "NotificationSendProcessingOrError"
   }
 
+  case object NotificationSendBrazeFailure extends CohortTableFilter {
+    override val value: String = "NotificationSendBrazeFailure"
+  }
+
   val all = Set(
     ReadyForEstimation,
     EstimationFailed,
